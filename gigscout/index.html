@@ -1,1 +1,68 @@
-
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>GigScout</title>
+<meta name="description" content="Un concerto condiviso con GigScout, l'app della musica dal vivo in Italia.">
+<style>
+  /* Palette Grafite (D22), come l'app. */
+  :root { --bg:#F5F5F1; --card:#FFFFFF; --fg:#18181B; --muted:#55555D; --line:#CFCFC7; --lime:#C6F432; --btn:#18181B; --btnfg:#FFFFFF; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0F0F11; --card:#19191C; --fg:#F2F2EE; --muted:#B5B5AE; --line:#3C3C42; --btn:#C6F432; --btnfg:#18181B; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 480px; margin: 0 auto; padding: 56px 20px; }
+  .logo { display: inline-flex; align-items: center; gap: 10px; font-size: 1.6rem; font-weight: 800; margin: 0 0 24px; }
+  .dot { width: 28px; height: 28px; border-radius: 50%; background: var(--lime); border: 6px solid var(--fg); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; }
+  h1 { font-size: 1.4rem; margin: 0 0 8px; }
+  p { margin: 0 0 16px; color: var(--muted); }
+  a.btn { display: block; text-align: center; text-decoration: none; font-weight: 800; padding: 16px;
+          min-height: 48px; border-radius: 16px; background: var(--btn); color: var(--btnfg); }
+  .hidden { display: none; }
+  footer { margin-top: 32px; font-size: .9rem; color: var(--muted); }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <div class="logo"><span class="dot" aria-hidden="true"></span>GigScout</div>
+  <div class="card">
+    <h1 id="titolo">Ti hanno condiviso qualcosa su GigScout</h1>
+    <p id="testo">Se l'app è installata su questo telefono, il pulsante la apre al punto giusto.</p>
+    <a id="apri" class="btn hidden" href="#">Apri in GigScout</a>
+    <p id="errore" class="hidden">Il link non è completo: chiedi a chi te l'ha mandato di condividerlo di nuovo.</p>
+  </div>
+  <footer>
+    L'app è in preparazione e arriverà su Google Play.
+    · <a href="https://paolomarchionetti-glitch.github.io/gigscout-legal/">Informazioni legali</a>
+  </footer>
+</main>
+<script>
+  // Il link arriva come ?evento=<id>, ?gruppo=<id> o ?utente=<id> (vedi DeepLinks.kt).
+  // Si accetta solo un id UUID: niente altro finisce nel link che apre l'app.
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var tipi = [["evento", "event", "Un concerto su GigScout"],
+                ["gruppo", "group", "Un gruppo per andare al concerto insieme"],
+                ["utente", "user", "Un profilo su GigScout"]];
+    var uuid = /^[0-9a-fA-F-]{8,64}$/;
+    for (var i = 0; i < tipi.length; i++) {
+      var id = q.get(tipi[i][0]);
+      if (id && uuid.test(id)) {
+        var a = document.getElementById("apri");
+        a.href = "gigscout://" + tipi[i][1] + "/" + id;
+        a.classList.remove("hidden");
+        document.getElementById("titolo").textContent = tipi[i][2];
+        return;
+      }
+    }
+    document.getElementById("errore").classList.remove("hidden");
+  })();
+</script>
+</body>
+</html>
