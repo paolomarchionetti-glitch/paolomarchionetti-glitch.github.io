@@ -1,1 +1,12 @@
-
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.paolomarchionetti.gigscout",
+      "sha256_cert_fingerprints": [
+        "B0:02:8D:8E:AD:C2:20:AD:EA:3C:A8:CD:0D:99:25:66:88:F8:FC:75:74:49:66:1B:D3:FA:C0:DD:03:77:43:79"
+      ]
+    }
+  }
+]
