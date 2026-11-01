@@ -23,6 +23,9 @@
   p { margin: 0 0 16px; color: var(--muted); }
   a.btn { display: block; text-align: center; text-decoration: none; font-weight: 800; padding: 16px;
           min-height: 48px; border-radius: 16px; background: var(--btn); color: var(--btnfg); }
+  a.btn + a.btn { margin-top: 12px; }
+  a.btn.secondary { background: transparent; color: var(--fg); border: 2px solid var(--line); }
+  .code { font: 800 1.8rem/1.2 ui-monospace, Menlo, Consolas, monospace; letter-spacing: .08em; margin: 0 0 16px; color: var(--fg); }
   .hidden { display: none; }
   footer { margin-top: 32px; font-size: .9rem; color: var(--muted); }
   footer a { color: inherit; }
@@ -34,6 +37,8 @@
   <div class="card">
     <h1 id="titolo">Ti hanno condiviso qualcosa su GigScout</h1>
     <p id="testo">Se l'app è installata su questo telefono, il pulsante la apre al punto giusto.</p>
+    <p id="codice" class="code hidden"></p>
+    <a id="scarica" class="btn hidden" href="#">Scarica GigScout da Google Play</a>
     <a id="apri" class="btn hidden" href="#">Apri in GigScout</a>
     <p id="errore" class="hidden">Il link non è completo: chiedi a chi te l'ha mandato di condividerlo di nuovo.</p>
   </div>
@@ -45,8 +50,28 @@
 <script>
   // Il link arriva come ?evento=<id>, ?gruppo=<id> o ?utente=<id> (vedi DeepLinks.kt).
   // Si accetta solo un id UUID: niente altro finisce nel link che apre l'app.
+  // Invito (PR-06): ?invito=GIG-XXXX. Il pulsante di Google Play porta il codice nel
+  // "referrer": l'app lo legge al primo avvio (Install Referrer) e lo compila da sola.
   (function () {
     var q = new URLSearchParams(location.search);
+    var invito = (q.get("invito") || "").toUpperCase().replace(/\s+/g, "");
+    if (/^GIG-[2-9A-HJKMNP-Z]{4,6}$/.test(invito)) {
+      document.getElementById("titolo").textContent = "Ti hanno invitato su GigScout";
+      document.getElementById("testo").textContent =
+        "Iscriviti con questo codice invito: se l'app è già installata, il secondo pulsante lo inserisce da solo.";
+      var c = document.getElementById("codice");
+      c.textContent = invito;
+      c.classList.remove("hidden");
+      var play = document.getElementById("scarica");
+      play.href = "https://play.google.com/store/apps/details?id=com.paolomarchionetti.gigscout&referrer=" +
+                  encodeURIComponent("ref=" + invito);
+      play.classList.remove("hidden");
+      var apri = document.getElementById("apri");
+      apri.href = "gigscout://invito/" + invito;
+      apri.classList.add("secondary");
+      apri.classList.remove("hidden");
+      return;
+    }
     var tipi = [["evento", "event", "Un concerto su GigScout"],
                 ["gruppo", "group", "Un gruppo per andare al concerto insieme"],
                 ["utente", "user", "Un profilo su GigScout"]];
